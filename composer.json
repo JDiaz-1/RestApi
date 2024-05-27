@@ -1,0 +1,18 @@
+{
+    "name": "jdiaz/rest-api",
+    "description": "Rest Api Helper",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Jdiaz\\RestApi\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "JDiaz"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
