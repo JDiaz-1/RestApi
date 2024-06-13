@@ -1,16 +1,16 @@
 {
-    "name": "jdiaz/rest-api",
+    "name": "agrocolor/rest-api",
     "description": "Rest Api Helper",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Jdiaz\\RestApi\\": "src/"
+            "Agrocolor\\RestAPI\\": "src/"
         }
     },
     "authors": [
         {
-            "name": "JDiaz"
+            "name": "Agrocolor"
         }
     ],
     "minimum-stability": "stable",

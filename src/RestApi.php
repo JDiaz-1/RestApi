@@ -1,6 +1,6 @@
 <?php
 
-namespace Jdiaz\RestAPI;
+namespace Agrocolor\RestAPI;
 
 class RestApi {
 
