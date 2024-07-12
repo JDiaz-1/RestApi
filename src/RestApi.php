@@ -10,7 +10,7 @@ class RestApi {
     public CONST DELETE = "DELETE";
     public CONST JSON_CONTENT_TYPE = 'Content-Type: application/json';
 
-    public function send(string $url, ?array $header, array $params, array $body, string $contentType, string $requestType): array 
+    static public function send(string $url, ?array $header, array $params, array $body, string $contentType, string $requestType): array
     {
         $curl = curl_init();
 
