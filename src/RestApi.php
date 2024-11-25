@@ -12,67 +12,49 @@ class RestApi
     public const JSON_CONTENT_TYPE = 'Content-Type: application/json';
     public const WWW_FORM_URLENCODED_TYPE = 'Content-Type: application/x-www-form-urlencoded';
 
-    public static function send(
-        string $url,
-        ?array $header,
-        array $params = [],
-        array $body = [],
-        string $contentType = self::JSON_CONTENT_TYPE,
-        string $requestType = self::POST
-    ): array {
+    public static function send(string $url, ?array $header, array $params, array $body, string $contentType, string $requestType): array
+    {
         $curl = curl_init();
 
-        // Construir la URL solo si es GET o DELETE
-        if (in_array($requestType, [self::GET, self::DELETE]) && !empty($params)) {
+        if ($requestType === self::GET && !empty($params)) {
             $url .= '?' . http_build_query($params);
         }
 
-        // Configurar el cuerpo de la solicitud
-        $payload = null;
-        if (in_array($requestType, [self::POST, self::PUT])) {
-            if ($contentType === self::JSON_CONTENT_TYPE) {
-                $payload = json_encode($body);
-            } elseif ($contentType === self::WWW_FORM_URLENCODED_TYPE) {
-                $payload = http_build_query($body);
-            }
+        $payload = http_build_query($body);
+
+        if ($contentType == self::JSON_CONTENT_TYPE) {
+            $payload = json_encode($body);
         }
 
-        // Configurar encabezados
-        $httpHeader = $header ?? [];
-        $httpHeader[] = $contentType;
+        if ($contentType == self::WWW_FORM_URLENCODED_TYPE) {
+            $payload = http_build_query($body);
+        }
 
-        // Configurar cURL
+        if ($requestType !== self::GET && !empty($params)) {
+            $payload = json_encode(array_merge($body, $params));
+        }
+
         curl_setopt_array($curl, [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
+            CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => $requestType,
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_HTTPHEADER => $httpHeader,
+            CURLOPT_POSTFIELDS => $requestType !== self::GET ? $payload : null,
+            CURLOPT_HTTPHEADER => $header ? $header : [$contentType],
         ]);
 
-        // Ejecutar la solicitud
         $response = curl_exec($curl);
 
-        // Manejar errores de cURL
         if (curl_errno($curl)) {
-            throw new \RuntimeException('cURL Error: ' . curl_error($curl));
+            print curl_error($curl);
         }
 
-        // Obtener código de respuesta HTTP
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        // Verificar códigos de respuesta HTTP no exitosos
-        if ($httpCode >= 400) {
-            throw new \RuntimeException("HTTP Error: $httpCode, Response: $response");
-        }
-
-        // Decodificar la respuesta JSON
-        return json_decode($response, true) ?? [];
+        return json_decode($response, true);
     }
 }
